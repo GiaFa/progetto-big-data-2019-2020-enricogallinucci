@@ -1,7 +1,5 @@
 package spark
 
-package spark
-
 object Breweries {
   def extract(row:String):Breweries = {
     def getInt(str:String) : Int = {

@@ -1,7 +1,5 @@
 package spark
 
-package spark
-
 import java.util.regex.Pattern
 
 object Beers {

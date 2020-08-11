@@ -1,7 +1,5 @@
 package spark
 
-package spark
-
 object Reviews {
   def extract(row:String):Reviews = {
     def getDouble(str:String) : Double = {
