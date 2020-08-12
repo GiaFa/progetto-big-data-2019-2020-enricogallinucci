@@ -18,7 +18,7 @@ object TopBeers extends SessionSpark{
     val beersRDD = removeFirstRow(beers).map(Beers.extract).keyBy(_.brewery_id)
     val breweriesRDD = removeFirstRow(breweries).map(Breweries.extract).keyBy(_.id)
     val reviewsRDD = removeFirstRow(reviews).map(Reviews.extract).keyBy(_.beer_id)
-    val reviewsRDDAveraged =  filterAndAvgReviews(reviewsRDD,50)
+    val reviewsRDDAveraged =  filterAndAvgReviews(reviewsRDD,minRecensioni)
     val reviewsAverageClass = createClassAvg(reviewsRDDAveraged)
     val beersAndBreweriesJoin = filterBreweries(beersRDD,breweriesRDD)
     val rddFinal =  countBeerPerBreweries(beersAndBreweriesJoin,reviewsAverageClass)
@@ -42,8 +42,8 @@ object TopBeers extends SessionSpark{
   }
   def createClassAvg(rdd: RDD[(Int, Double)]): RDD[(Int, (Double, Int))] ={
       rdd.mapValues{
-        case d if d <=RANGE_SCORE_B.value._1=> (d,RANGE_SCORE_B.value._1)
-        case d if d <=RANGE_SCORE_B.value._2=> (d,RANGE_SCORE_B.value._2)
+        case d if d <=RANGE_SCORE_B.value._1 => (d,RANGE_SCORE_B.value._1)
+        case d if d <=RANGE_SCORE_B.value._2 => (d,RANGE_SCORE_B.value._2)
         case d => (d,RANGE_SCORE_B.value._3)
       }
   }
