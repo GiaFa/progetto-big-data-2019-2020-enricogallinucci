@@ -12,10 +12,8 @@ import spark.{Beers, Breweries, Reviews, SessionSpark}
 object TopBreweries extends SessionSpark {
 
   def executeJob(nBirrerie: Int = 20,beersForBrewery: Int = 5, minRecensioni: Int = 50): Unit = {
-    val beers = sparkSession.sparkContext.textFile("giovannim/dataset/input/datasetprogetto/beers.csv")
-    val reviews = sparkSession.sparkContext.textFile("giovannim/dataset/input/datasetprogetto/reviews.csv")
-    val breweries = sparkSession.sparkContext.textFile("giovannim/dataset/input/datasetprogetto/breweries.csv")
 
+    val (beers,reviews,breweries) = readFile()
     val beersRDD = removeFirstRow(beers).map(Beers.extract).keyBy(_.brewery_id)
     val breweriesRDD = removeFirstRow(breweries).map(Breweries.extract).keyBy(_.id)
     val reviewsRDD = removeFirstRow(reviews).map(Reviews.extract).keyBy(_.beer_id)
