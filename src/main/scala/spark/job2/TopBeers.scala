@@ -1,7 +1,7 @@
 package spark.job2
 
-import org.apache.spark.rdd.RDD
 import spark.{Beers, Breweries, Reviews, SessionSpark}
+import org.apache.spark.rdd.RDD
 
 object TopBeers extends SessionSpark{
   private val RANGE_SCORE = (2,4,5)
@@ -56,7 +56,7 @@ object TopBeers extends SessionSpark{
       },(temp,actual) => (temp._1+actual._1,temp._2+actual._2,temp._3+actual._3))
 
   }
-  private def searchNameBreweries(rddFinal:RDD[(Int, (Int, Int, Int))], breweries: RDD[(Int, Breweries)])={
+  def searchNameBreweries(rddFinal:RDD[(Int, (Int, Int, Int))], breweries: RDD[(Int, Breweries)])={
     rddFinal.join(breweries).mapValues(x=>(x._2.name,x._1._1,x._1._2,x._1._3))
   }
  /* def verifyExistFile(): Unit ={
