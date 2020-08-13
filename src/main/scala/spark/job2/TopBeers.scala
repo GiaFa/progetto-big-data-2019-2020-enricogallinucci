@@ -15,9 +15,9 @@ object TopBeers extends SessionSpark{
 
   def executeJob(nBirrerie: Int = 20, nClass: Int = 5, minAvgScore: Int = 2, minRecensioni: Int = 50): Unit = {
     val (beers,reviews,breweries) = readFile()
-    val beersRDD = removeFirstRow(beers).map(Beers.extract).keyBy(_.brewery_id)
-    val breweriesRDD = removeFirstRow(breweries).map(Breweries.extract).keyBy(_.id)
-    val reviewsRDD = removeFirstRow(reviews).map(Reviews.extract).keyBy(_.beer_id)
+    val beersRDD = removeFirstRow(beers).map(Beers.extract).keyBy(_.brewery_id).persist().cache()
+    val breweriesRDD = removeFirstRow(breweries).map(Breweries.extract).keyBy(_.id).persist().cache()
+    val reviewsRDD = removeFirstRow(reviews).map(Reviews.extract).keyBy(_.beer_id).persist().cache()
     val reviewsRDDAveraged =  filterAndAvgReviews(reviewsRDD,minRecensioni)
     val reviewsAverageClass = createClassAvg(reviewsRDDAveraged)
     val beersAndBreweriesJoin = filterBreweries(beersRDD,breweriesRDD)
@@ -56,7 +56,7 @@ object TopBeers extends SessionSpark{
       },(temp,actual) => (temp._1+actual._1,temp._2+actual._2,temp._3+actual._3))
 
   }
-  def searchNameBreweries(rddFinal:RDD[(Int, (Int, Int, Int))], breweries: RDD[(Int, Breweries)])={
+  def searchNameBreweries(rddFinal:RDD[(Int, (Int, Int, Int))], breweries: RDD[(Int, Breweries)]): RDD[(Int, (String, Int, Int, Int))] ={
     rddFinal.join(breweries).mapValues(x=>(x._2.name,x._1._1,x._1._2,x._1._3))
   }
  /* def verifyExistFile(): Unit ={

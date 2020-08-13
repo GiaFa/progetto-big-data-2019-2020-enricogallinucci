@@ -1,6 +1,5 @@
 package hadoop.job2;
 
-import hadoop.Beer;
 import hadoop.Brewery;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -9,7 +8,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class BreweriesMapper extends Mapper<Object, Text, IntWritable, Brewery> {

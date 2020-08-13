@@ -13,9 +13,6 @@ import java.util.stream.Collectors;
 
 public class BeersMapper extends Mapper<Object, Text, IntWritable, Beer> {
     private boolean first = true;
-    private String regex =  "([0-9]*)";
-
-
     private int getInt(String str) {
         if (str.isEmpty())
             return 0;
