@@ -1,17 +1,19 @@
 package hadoop.job2;
 
 import hadoop.Beer;
+import hadoop.BeerOrBrewery;
+import hadoop.Brewery;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-public class BeersMapper extends Mapper<Object, Text, IntWritable, Beer> {
+public class BeersMapper extends Mapper<Object, Text, IntWritable, BeerOrBrewery> {
     private boolean first = true;
     private int getInt(String str) {
         if (str.isEmpty())
@@ -24,7 +26,7 @@ public class BeersMapper extends Mapper<Object, Text, IntWritable, Beer> {
         throws IOException, InterruptedException {
         if (!first) {
 
-            List<String> columns = Arrays.stream(value.toString().split(",")).map(x -> x.replaceAll("\"","")).collect(Collectors.toList());
+            List<String> columns = Arrays.asList(value.toString().split(","));
             int id = getInt(columns.get(0));
             int i = 2;
             String name = columns.get(1);
@@ -33,7 +35,9 @@ public class BeersMapper extends Mapper<Object, Text, IntWritable, Beer> {
                 i = i+1;
             }
             int brewery = getInt(columns.get(i));
-            context.write(new IntWritable(id),new Beer(id,name,brewery));
+            BeerOrBrewery result = new BeerOrBrewery();
+            result.setBeer(new Beer(id,name,brewery));
+            context.write(new IntWritable(brewery),result);
         } else {
             first = false;
         }

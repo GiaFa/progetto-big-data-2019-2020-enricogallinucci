@@ -1,6 +1,6 @@
 package hadoop.job2;
 
-import hadoop.Review;
+import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -8,9 +8,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class ReviewsMapper extends Mapper<Object, Text, IntWritable, Review>{
+public class ReviewsMapper extends Mapper<Object, Text, IntWritable, DoubleWritable>{
 
     private boolean first = true;
 
@@ -24,10 +23,10 @@ public class ReviewsMapper extends Mapper<Object, Text, IntWritable, Review>{
     public void map(Object key, Text value, Mapper.Context context)
             throws IOException, InterruptedException {
         if (!first) {
-            List<String> columns = Arrays.stream(value.toString().split(",")).map(x -> x.replaceAll("\"","")).collect(Collectors.toList());
+            List<String> columns = Arrays.asList(value.toString().split(","));
             int beer_id = Integer.parseInt(columns.get(0));
             double overall = getDouble(columns.get(columns.size() -1));
-            context.write(new IntWritable(beer_id),new Review(beer_id,overall));
+            context.write(new IntWritable(beer_id),new DoubleWritable(overall));
         } else {
             first = false;
         }
