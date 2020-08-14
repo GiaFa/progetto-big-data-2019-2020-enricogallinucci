@@ -6,7 +6,6 @@ import hadoop.job2.BeersAndBreweriesReducer;
 import hadoop.commonjob.BeersMapper;
 import hadoop.commonjob.BreweriesMapper;
 import hadoop.job2.Job2;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -15,7 +14,6 @@ import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
-import static hadoop.commonjob.Common.*;
 import java.io.IOException;
 /**
  * Top 20 birrerie con almeno 5 birre diverse
@@ -24,16 +22,16 @@ import java.io.IOException;
  */
 public class Job1 {
     public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Job jobAvg = Job.getInstance(SonCommon.commonConf(),"AvgReviews");
-        Job jobCreateClasses = Job.getInstance(SonCommon.commonConf(),"Beer Classes");
-        Job jobBeerAndBreweries = Job.getInstance(SonCommon.commonConf(),"Beers and Breweries fusion");
-        Path beerPath = SonCommon.beerPath();
-        Path breweriesPath = SonCommon.breweryPath();
+        Job jobAvg = Job.getInstance(Common.commonConf(),"AvgReviews");
+        Job jobCreateClasses = Job.getInstance(Common.commonConf(),"Beer Classes");
+        Job jobBeerAndBreweries = Job.getInstance(Common.commonConf(),"Beers and Breweries fusion");
+        Path beerPath = Common.beerPath();
+        Path breweriesPath = Common.breweryPath();
         Path reviewsPath = new Path("giovannim/dataset/input/datasetprogetto/reviews.csv");
         Path avgTmpPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/AvgTmp");
         Path beersAndBreweriesTmpPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/BeersAndBreweries");
 
-        FileSystem fs = FileSystem.get(SonCommon.commonConf());
+        FileSystem fs = FileSystem.get(Common.commonConf());
         if(fs.exists(avgTmpPath)) {
             fs.delete(avgTmpPath, true);
         }

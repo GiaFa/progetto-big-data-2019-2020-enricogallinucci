@@ -20,7 +20,7 @@ public class ReviewsMapper extends Mapper<Object, Text, IntWritable, DoubleWrita
             return Double.parseDouble(str);
     }
 
-    public void map(Object key, Text value, Mapper.Context context)
+    public void map(Object key, Text value, Context context)
             throws IOException, InterruptedException {
         if (!first) {
             List<String> columns = Arrays.asList(value.toString().split(","));
