@@ -41,8 +41,9 @@ object TopBeers extends SessionSpark{
         case d => (d,RANGE_SCORE_B.value._3)
       }
   }
+
   def countBeerPerBreweries(beersAndBreweriesJoin: RDD[(Int, (Beers, Breweries))], reviewsAverageClass: RDD[(Int, (Double, Int))]): RDD[(Int, (Int, Int, Int))] = {
-    beersAndBreweriesJoin.join(reviewsAverageClass).map(x => (x._2._1._2.id, (x._2._1._1,x._2._1._2,x._2._2._2)))
+    beersAndBreweriesJoin.join(reviewsAverageClass).map(x =>  (x._2._1._2.id, (x._2._1._1,x._2._1._2,x._2._2._2)))
       .aggregateByKey((0,0,0))({
         case (avg,count) if count._3==RANGE_SCORE_B.value._1 => (avg._1+1,avg._2,avg._3)
         case (avg,count) if count._3==RANGE_SCORE_B.value._2 => (avg._1,avg._2+1,avg._3)

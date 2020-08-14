@@ -12,6 +12,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
+import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
@@ -56,7 +58,20 @@ public class Job2 {
 //
 //       jobAvg.setOutputKeyClass(IntWritable.class);
 //       jobAvg.setOutputValueClass(DoubleWritable.class);
+       Configuration conf2 = new Configuration();
+       ControlledJob jobA = new ControlledJob(conf2);
+       ControlledJob jobB = new ControlledJob(conf2);
 
+       ControlledJob jobC = new ControlledJob(conf2);
+       jobC.addDependingJob(jobA);
+       jobC.addDependingJob(jobB);
+
+       JobControl jobControl = new JobControl("s");
+       jobControl.addJob(jobA);
+       jobControl.addJob(jobB);
+       jobControl.addJob(jobC);
+
+       jobControl.run();
 
        MultipleInputs.addInputPath(jobBeerAndBreweries,beerPath, TextInputFormat.class, BeersMapper.class);
        MultipleInputs.addInputPath(jobBeerAndBreweries,breweriesPath, TextInputFormat.class, BreweriesMapper.class);
