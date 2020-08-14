@@ -1,18 +1,8 @@
 package hadoop.job1;
 
-import hadoop.BeerOrBrewery;
 import hadoop.commonjob.Common;
-import hadoop.job2.BeersAndBreweriesReducer;
-import hadoop.commonjob.BeersMapper;
-import hadoop.commonjob.BreweriesMapper;
-import hadoop.job2.Job2;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
-import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
+import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 
 import java.io.IOException;
 /**
@@ -21,36 +11,35 @@ import java.io.IOException;
  * (puo cambiare la quantita), vedremo la media di ricensioni per ogni birra).
  */
 public class Job1 {
-    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-        Job jobAvg = Job.getInstance(Common.commonConf(),"AvgReviews");
-        Job jobCreateClasses = Job.getInstance(Common.commonConf(),"Beer Classes");
-        Job jobBeerAndBreweries = Job.getInstance(Common.commonConf(),"Beers and Breweries fusion");
-        Path beerPath = Common.beerPath();
-        Path breweriesPath = Common.breweryPath();
-        Path reviewsPath = new Path("giovannim/dataset/input/datasetprogetto/reviews.csv");
-        Path avgTmpPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/AvgTmp");
-        Path beersAndBreweriesTmpPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/BeersAndBreweries");
 
-        FileSystem fs = FileSystem.get(Common.commonConf());
-        if(fs.exists(avgTmpPath)) {
-            fs.delete(avgTmpPath, true);
-        }
+    private static final JobControl jc=Common.jobControl("Job1");
+    private static ControlledJob jobAvg;
+    private static ControlledJob jobBeerAndBreweries;
 
-        if(fs.exists(beersAndBreweriesTmpPath)) {
-            fs.delete(beersAndBreweriesTmpPath, true);
-        }
-        MultipleInputs.addInputPath(jobBeerAndBreweries,beerPath, TextInputFormat.class, BeersMapper.class);
-        MultipleInputs.addInputPath(jobBeerAndBreweries,breweriesPath, TextInputFormat.class, BreweriesMapper.class);
-        SequenceFileOutputFormat.setOutputPath(jobBeerAndBreweries, beersAndBreweriesTmpPath);
-        jobBeerAndBreweries.setJarByClass(Job2.class);
-        jobBeerAndBreweries.setReducerClass(BeersAndBreweriesReducer.class);
-        jobBeerAndBreweries.setMapOutputKeyClass(IntWritable.class);
-        jobBeerAndBreweries.setMapOutputValueClass(BeerOrBrewery.class);
-        jobBeerAndBreweries.setOutputKeyClass(IntWritable.class);
-        jobBeerAndBreweries.setOutputValueClass(BeerOrBrewery.class);
-        jobBeerAndBreweries.setOutputFormatClass(SequenceFileOutputFormat.class);
-        if (!jobBeerAndBreweries.waitForCompletion(true)) {
-            System.exit(1);
-        }
+    public static void main(String[] args) throws IOException {
+        setControllerJobAndJobControl();
+        Common.allPath();
+        Common.verifyDirectory();
+        setJobAvg();
+        setJobBeerAndBreweries();
+        jc.run();
+    }
+
+    private static void setControllerJobAndJobControl() throws IOException {
+        jobAvg = Common.controlledJob();
+        jobBeerAndBreweries = Common.controlledJob();
+        setJobControl();
+    }
+
+    private static void setJobControl(){
+        jc.addJob(jobAvg);
+        jc.addJob(jobBeerAndBreweries);
+    }
+
+    private static void setJobAvg() throws IOException {
+        Common.jobAvg(jobAvg,Common.getReviewsPath(),Common.getAvgTmpPath());
+    }
+    private static void setJobBeerAndBreweries(){
+        Common.jobBeerAndBreweries(jobBeerAndBreweries,Common.getBeerPath(),Common.getBreweriesPath(),Common.getBeersAndBreweriesTmpPath());
     }
 }

@@ -1,22 +1,17 @@
 package hadoop.job2;
 
-import hadoop.BeerOrBrewery;
-import hadoop.Brewery;
-import hadoop.commonjob.BeersMapper;
-import hadoop.commonjob.BreweriesMapper;
 import hadoop.commonjob.Common;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.lib.input.*;
+import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
 
@@ -26,114 +21,85 @@ import java.io.IOException;
  * a seconda dei dati), quindi calcolare per ogni birreria la quantità di birre in ogni classe; eventualmente le si può
  * anche ordinare sulla base di uno score (ipotizzando di associare ad ogni classe un punteggio).
  */
-public class Job2 {
-   public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-       Configuration conf = Common.commonConf();
-       ControlledJob cont = new ControlledJob(conf);
-       ControlledJob cont1 = new ControlledJob(conf);
-       ControlledJob cont2 = new ControlledJob(conf);
-       cont2.addDependingJob(cont);
-       cont2.addDependingJob(cont1);
-       JobControl jc = new JobControl("aaa");
-       jc.addJob(cont);
-       jc.addJob(cont1);
-       jc.addJob(cont2);
-       jc.run();
-       Job jobAvg = Common.commonJob("AvgReviews");
-       Job jobBeerAndBreweries = Common.commonJob("Beers and Breweries fusion");
-       Job jobBreweriesClasses = Common.commonJob("Beer Classes");
-       Job jobFinal = Common.commonJob("Final Job");
-       Path beerPath = new Path("giovannim/dataset/input/datasetprogetto/beers.csv");
-       Path breweriesPath = new Path("giovannim/dataset/input/datasetprogetto/breweries.csv");
-       Path reviewsPath = new Path("giovannim/dataset/input/datasetprogetto/reviews.csv");
-       Path avgTmpPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/AvgTmp");
-       Path beersAndBreweriesTmpPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/BeersAndBreweries");
-       Path breweriesClassesPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/BreweriesClasses");
-       Path resultPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/job2");
-       FileSystem fs = FileSystem.get(conf);
+public class Job2  extends Configured implements Tool {
 
-      if(fs.exists(avgTmpPath)) {
-          fs.delete(avgTmpPath, true);
-      }
+    private static final JobControl jc=Common.jobControl("Job2");
+    private static ControlledJob jobAvg;
+    private static ControlledJob jobBeerAndBreweries;
+    private static ControlledJob jobBreweriesClasses;
+    private static ControlledJob jobFinal;
 
-      if(fs.exists(beersAndBreweriesTmpPath)) {
-          fs.delete(beersAndBreweriesTmpPath, true);
-      }
+   public static void main(String[] args) throws Exception {
+       ToolRunner.run(new Job2(), args);
+   }
 
-      if(fs.exists(breweriesClassesPath)) {
-          fs.delete(breweriesClassesPath, true);
-      }
-
-
-       if(fs.exists(resultPath)) {
-           fs.delete(resultPath, true);
-       }
-
-       FileInputFormat.addInputPath(jobAvg,reviewsPath);
-       SequenceFileOutputFormat.setOutputPath(jobAvg,avgTmpPath);
-       jobAvg.setJarByClass(Job2.class);
-       jobAvg.setMapperClass(ReviewsMapper.class);
-       jobAvg.setReducerClass(ReviewsAvg.class);
-       jobAvg.setMapOutputKeyClass(IntWritable.class);
-       jobAvg.setMapOutputValueClass(DoubleWritable.class);
-       jobAvg.setOutputKeyClass(IntWritable.class);
-       jobAvg.setOutputValueClass(IntWritable.class);
-       jobAvg.setOutputFormatClass(SequenceFileOutputFormat.class);
-
-       MultipleInputs.addInputPath(jobBeerAndBreweries,beerPath, TextInputFormat.class, BeersMapper.class);
-       MultipleInputs.addInputPath(jobBeerAndBreweries,breweriesPath, TextInputFormat.class, BreweriesMapper.class);
-       SequenceFileOutputFormat.setOutputPath(jobBeerAndBreweries, beersAndBreweriesTmpPath);
-       jobBeerAndBreweries.setJarByClass(Job2.class);
-       jobBeerAndBreweries.setReducerClass(BeersAndBreweriesReducer.class);
-       jobBeerAndBreweries.setMapOutputKeyClass(IntWritable.class);
-       jobBeerAndBreweries.setMapOutputValueClass(BeerOrBrewery.class);
-       jobBeerAndBreweries.setOutputKeyClass(IntWritable.class);
-       jobBeerAndBreweries.setOutputValueClass(BeerOrBrewery.class);
-       jobBeerAndBreweries.setOutputFormatClass(SequenceFileOutputFormat.class);
-
-       if (!jobAvg.waitForCompletion(true)) {
-           System.exit(1);
-       }
-       if (!jobBeerAndBreweries.waitForCompletion(true)) {
-           System.exit(1);
-       }
-
-       MultipleInputs.addInputPath(jobBreweriesClasses,avgTmpPath, SequenceFileInputFormat.class, AvgMapper.class);
-       MultipleInputs.addInputPath(jobBreweriesClasses,beersAndBreweriesTmpPath, SequenceFileInputFormat.class, BreweriesClassesMapper.class);
-       FileOutputFormat.setOutputPath(jobBreweriesClasses,breweriesClassesPath);
-       jobBreweriesClasses.setJarByClass(Job2.class);
-      jobBreweriesClasses.setReducerClass(BreweriesClassesReducer.class);
-
-      jobBreweriesClasses.setMapOutputKeyClass(IntWritable.class);
-      jobBreweriesClasses.setMapOutputValueClass(BreweriesAndClasses.class);
-
-      jobBreweriesClasses.setOutputKeyClass(IntWritable.class);
-      jobBreweriesClasses.setOutputValueClass(BreweriesAndClasses.class);
-      jobBreweriesClasses.setOutputFormatClass(SequenceFileOutputFormat.class);
-       if (!jobBreweriesClasses.waitForCompletion(true)) {
-           System.exit(1);
-       }
-
-       jobFinal.setNumReduceTasks(1);
-       SequenceFileInputFormat.addInputPath(jobFinal,breweriesClassesPath);
-       jobFinal.setInputFormatClass(SequenceFileInputFormat.class);
-       FileOutputFormat.setOutputPath(jobFinal,resultPath);
-       jobFinal.setJarByClass(Job2.class);
-       jobFinal.setMapperClass(ResultMapper.class);
-       jobFinal.setReducerClass(ResultReducer.class);
-       jobFinal.setMapOutputKeyClass(Pair.class);
-       jobFinal.setMapOutputValueClass(Text.class);
-       jobFinal.setOutputKeyClass(Text.class);
-       jobFinal.setOutputValueClass(Text.class);
-       System.exit(jobFinal.waitForCompletion(true) ? 0 : 1);
-
-//       if (!jobAvg.waitForCompletion(true)) {
-//           System.exit(1);
-//       }
-
-//
-
-
-
+    @Override
+    public int run(String[] args) throws Exception {
+        setControllerJobAndJobControl();
+        Common.allPath();
+        Common.verifyDirectory();
+        setJobAvg();
+        setJobBeerAndBreweries();
+        setJobBreweriesClasses();
+        setFinalJob();
+        Common.runJobControl(jc);
+        return 0;
     }
+
+    private static void setControllerJobAndJobControl() throws IOException {
+        jobAvg = Common.controlledJob();
+        jobBeerAndBreweries = Common.controlledJob();
+        jobBreweriesClasses = Common.controlledJob();
+        jobFinal = Common.controlledJob();
+        jobBreweriesClasses.addDependingJob(jobAvg);
+        jobBreweriesClasses.addDependingJob(jobBeerAndBreweries);
+        jobFinal.addDependingJob(jobBreweriesClasses);
+        setJobControl();
+    }
+
+    private static void setJobControl(){
+        jc.addJob(jobAvg);
+        jc.addJob(jobBeerAndBreweries);
+        jc.addJob(jobBreweriesClasses);
+        jc.addJob(jobFinal);
+    }
+
+    private static void setJobAvg() throws IOException {
+        Common.jobAvg(jobAvg,Common.getReviewsPath(),Common.getAvgTmpPath());
+    }
+
+    private static void setJobBeerAndBreweries(){
+        Common.jobBeerAndBreweries(jobBeerAndBreweries,Common.getBeerPath(),Common.getBreweriesPath(),Common.getBeersAndBreweriesTmpPath());
+    }
+
+    private static void setJobBreweriesClasses(){
+
+        MultipleInputs.addInputPath(jobBreweriesClasses.getJob(),Common.getAvgTmpPath(), SequenceFileInputFormat.class, AvgMapper.class);
+        MultipleInputs.addInputPath(jobBreweriesClasses.getJob(),Common.getBeersAndBreweriesTmpPath(), SequenceFileInputFormat.class, BreweriesClassesMapper.class);
+        FileOutputFormat.setOutputPath(jobBreweriesClasses.getJob(),Common.getBreweriesClassesPath());
+        jobBreweriesClasses.getJob().setJarByClass(Job2.class);
+        jobBreweriesClasses.getJob().setReducerClass(BreweriesClassesReducer.class);
+
+        jobBreweriesClasses.getJob().setMapOutputKeyClass(IntWritable.class);
+        jobBreweriesClasses.getJob().setMapOutputValueClass(BreweriesAndClasses.class);
+
+        jobBreweriesClasses.getJob().setOutputKeyClass(IntWritable.class);
+        jobBreweriesClasses.getJob().setOutputValueClass(BreweriesAndClasses.class);
+        jobBreweriesClasses.getJob().setOutputFormatClass(SequenceFileOutputFormat.class);
+    }
+
+    private static void setFinalJob() throws IOException {
+        jobFinal.getJob().setNumReduceTasks(1);
+        SequenceFileInputFormat.addInputPath(jobFinal.getJob(),Common.getBreweriesClassesPath());
+        jobFinal.getJob().setInputFormatClass(SequenceFileInputFormat.class);
+        FileOutputFormat.setOutputPath(jobFinal.getJob(),Common.getResultPath());
+        jobFinal.getJob().setJarByClass(Job2.class);
+        jobFinal.getJob().setMapperClass(ResultMapper.class);
+        jobFinal.getJob().setReducerClass(ResultReducer.class);
+        jobFinal.getJob().setMapOutputKeyClass(Pair.class);
+        jobFinal.getJob().setMapOutputValueClass(Text.class);
+        jobFinal.getJob().setOutputKeyClass(Text.class);
+        jobFinal.getJob().setOutputValueClass(Text.class);
+    }
+
 }
