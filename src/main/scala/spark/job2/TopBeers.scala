@@ -10,7 +10,7 @@ object TopBeers extends SessionSpark{
 
   def toPrint(values:(Int,(String,Int,Int,Int))): String = {
     values._2._1.concat(" Quantità Birre Qualità Bassa : ").concat(values._2._2.toString)
-      .concat(" Quantità Birre Qualità Medie : ").concat(values._2._3.toString)
+      .concat(" Quantità Birre Qualità Media : ").concat(values._2._3.toString)
       .concat(" Quantità Birre Qualità Alta : ").concat(values._2._4.toString)
   }
 

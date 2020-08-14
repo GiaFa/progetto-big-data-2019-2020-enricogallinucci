@@ -19,6 +19,12 @@ public class BeerOrBrewery implements Writable {
             this.isBeer = true;
     }
 
+    public static BeerOrBrewery read(DataInput in) throws IOException {
+        BeerOrBrewery w = new BeerOrBrewery();
+        w.readFields(in);
+        return w;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
