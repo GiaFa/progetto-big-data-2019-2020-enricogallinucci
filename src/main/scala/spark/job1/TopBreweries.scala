@@ -1,6 +1,7 @@
 package spark.job1
 
 import org.apache.spark.rdd.RDD
+import spark.commonmethod.Common
 import spark.{Beers, Breweries, Reviews, SessionSpark}
 
 
@@ -18,7 +19,7 @@ object TopBreweries extends SessionSpark {
     val breweriesRDD = removeFirstRow(breweries).map(Breweries.extract).keyBy(_.id)
     val reviewsRDD = removeFirstRow(reviews).map(Reviews.extract).keyBy(_.beer_id)
     val beersAndBreweriesJoin = filterBreweries(beersRDD,breweriesRDD,beersForBrewery)
-    val reviewsRDDAveraged = filterAndAvgReviews(reviewsRDD,minRecensioni)
+    val reviewsRDDAveraged = Common.filterAndAvgReviews(reviewsRDD,minRecensioni)
 
     topNBreweries(beersAndBreweriesJoin,reviewsRDDAveraged).zipWithIndex().filter(_._2 < nBirrerie).saveAsTextFile("giovannim/dataset/output/datasetprogetto/spark/")
 
@@ -33,14 +34,6 @@ object TopBreweries extends SessionSpark {
     val map = rdd.countByKey()
     rdd.filter(x => map(x._1) >= beersForBrewery).join(breweriesRDD).map(x => (x._2._1.id,x._2))
   }
-
-  private def filterAndAvgReviews(rdd: RDD[(Int,Reviews)], nReviews: Int):RDD[(Int,Double)] = {
-    val map = rdd.mapValues(_ => 1L).reduceByKey(_+_).filter(_._2 >= nReviews)
-    map.join(rdd).map(x => (x._1,x._2._2))
-      .aggregateByKey((0.0,0.0))((avg,count) => (avg._1 + count.overall, avg._2+1),(temp,actual) => (temp._1+actual._1,temp._2+actual._2))
-      .mapValues(x => x._1 / x._2)
-  }
-
   private def topNBreweries( beersAndBreweries:RDD[(Int, (Beers, Breweries))], beersAvg:RDD[(Int, Double)]): RDD[(Int, (String, Double))] ={
     beersAvg.join(beersAndBreweries).map(x => (x._2._2._2.id, x._2))
       .mapValues(x => (x,1)).reduceByKey((x,y) => ((x._1._1 + y._1._1,x._1._2),x._2 + y._2)).mapValues(x => (x._1._2._2.name,x._1._1 / x._2))

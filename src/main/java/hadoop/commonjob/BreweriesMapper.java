@@ -1,13 +1,11 @@
-package hadoop.job2;
+package hadoop.commonjob;
 
 import hadoop.BeerOrBrewery;
 import hadoop.Brewery;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,7 +20,7 @@ public class BreweriesMapper extends Mapper<Object, Text, IntWritable, BeerOrBre
             return Integer.parseInt(str);
     }
 
-    public void map(Object key, Text value, Mapper.Context context)
+    public void map(Object key, Text value, Context context)
             throws IOException, InterruptedException {
         if (!first) {
             List<String> columns = Arrays.asList(value.toString().split(","));

@@ -1,14 +1,12 @@
-package hadoop.job2;
+package hadoop.commonjob;
 
 import hadoop.Beer;
 import hadoop.BeerOrBrewery;
-import hadoop.Brewery;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;

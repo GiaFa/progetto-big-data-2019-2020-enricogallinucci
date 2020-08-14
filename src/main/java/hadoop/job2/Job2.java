@@ -2,10 +2,11 @@ package hadoop.job2;
 
 
 import hadoop.BeerOrBrewery;
+import hadoop.commonjob.BeersMapper;
+import hadoop.commonjob.BreweriesMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
@@ -13,7 +14,6 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 import java.io.IOException;
@@ -58,8 +58,8 @@ public class Job2 {
 //       jobAvg.setOutputValueClass(DoubleWritable.class);
 
 
-       MultipleInputs.addInputPath(jobBeerAndBreweries,beerPath, TextInputFormat.class,BeersMapper.class);
-       MultipleInputs.addInputPath(jobBeerAndBreweries,breweriesPath, TextInputFormat.class,BreweriesMapper.class);
+       MultipleInputs.addInputPath(jobBeerAndBreweries,beerPath, TextInputFormat.class, BeersMapper.class);
+       MultipleInputs.addInputPath(jobBeerAndBreweries,breweriesPath, TextInputFormat.class, BreweriesMapper.class);
        SequenceFileOutputFormat.setOutputPath(jobBeerAndBreweries, beersAndBreweriesTmpPath);
        jobBeerAndBreweries.setJarByClass(Job2.class);
        jobBeerAndBreweries.setReducerClass(BeersAndBreweriesReducer.class);

@@ -2,6 +2,7 @@ package spark.job2
 
 import spark.{Beers, Breweries, Reviews, SessionSpark}
 import org.apache.spark.rdd.RDD
+import spark.commonmethod.Common
 
 object TopBeers extends SessionSpark{
   private val RANGE_SCORE = (2,4,5)
@@ -18,13 +19,12 @@ object TopBeers extends SessionSpark{
     val beersRDD = removeFirstRow(beers).map(Beers.extract).keyBy(_.brewery_id).persist().cache()
     val breweriesRDD = removeFirstRow(breweries).map(Breweries.extract).keyBy(_.id).persist().cache()
     val reviewsRDD = removeFirstRow(reviews).map(Reviews.extract).keyBy(_.beer_id).persist().cache()
-    val reviewsRDDAveraged =  filterAndAvgReviews(reviewsRDD,minRecensioni)
+    val reviewsRDDAveraged =   Common.filterAndAvgReviews(reviewsRDD,minRecensioni)
     val reviewsAverageClass = createClassAvg(reviewsRDDAveraged)
     val beersAndBreweriesJoin = filterBreweries(beersRDD,breweriesRDD)
     val rddFinal =  countBeerPerBreweries(beersAndBreweriesJoin,reviewsAverageClass)
     searchNameBreweries(rddFinal,breweriesRDD).map(toPrint).saveAsTextFile("faspeeencina/datasets/output/project/spark/")
   }
-
 
   def removeFirstRow(rdd: RDD[String]): RDD[String] = {
     val firstRow = rdd.first()
@@ -34,12 +34,6 @@ object TopBeers extends SessionSpark{
   def filterBreweries(rdd: RDD[(Int,Beers)],breweriesRDD: RDD[(Int,Breweries)]): RDD[(Int,(Beers,Breweries))] =
     rdd.join(breweriesRDD).map(x => (x._2._1.id,x._2))
 
-  def filterAndAvgReviews(rdd: RDD[(Int,Reviews)], nReviews: Int):RDD[(Int,Double)] = {
-    val map = rdd.mapValues(_ => 1L).reduceByKey(_+_).filter(_._2 >= nReviews)
-    map.join(rdd).map(x => (x._1,x._2._2))
-      .aggregateByKey((0.0,0.0))((avg,count) => (avg._1 + count.overall, avg._2+1),(temp,actual) => (temp._1+actual._1,temp._2+actual._2))
-      .mapValues(x => x._1 / x._2)
-  }
   def createClassAvg(rdd: RDD[(Int, Double)]): RDD[(Int, (Double, Int))] ={
       rdd.mapValues{
         case d if d <=RANGE_SCORE_B.value._1 => (d,RANGE_SCORE_B.value._1)
