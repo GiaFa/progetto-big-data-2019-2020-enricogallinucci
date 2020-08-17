@@ -1,9 +1,11 @@
 package hadoop.commonjob;
 
 import hadoop.BeerOrBrewery;
+import hadoop.job1.BeersAndBreweriesReducer2;
+import hadoop.job1.ReviewsReducerAvg2;
 import hadoop.job2.BeersAndBreweriesReducer;
 import hadoop.job2.Job2;
-import hadoop.job2.ReviewsAvg;
+import hadoop.job2.ReviewsAvgReducer;
 import hadoop.job2.ReviewsMapper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -80,12 +82,18 @@ public class Common {
         SequenceFileOutputFormat.setOutputPath(jobAvg.getJob(),avgTmpPath);
         jobAvg.getJob().setJarByClass(Job2.class);
         jobAvg.getJob().setMapperClass(ReviewsMapper.class);
-        jobAvg.getJob().setReducerClass(ReviewsAvg.class);
         jobAvg.getJob().setMapOutputKeyClass(IntWritable.class);
         jobAvg.getJob().setMapOutputValueClass(DoubleWritable.class);
         jobAvg.getJob().setOutputKeyClass(IntWritable.class);
-        jobAvg.getJob().setOutputValueClass(IntWritable.class);
         jobAvg.getJob().setOutputFormatClass(SequenceFileOutputFormat.class);
+    }
+    public static void setReducerJob2Avg(ControlledJob jobAvg){
+        jobAvg.getJob().setReducerClass(ReviewsAvgReducer.class);
+        jobAvg.getJob().setOutputValueClass(IntWritable.class);
+    }
+    public static void setReducerJob1Avg(ControlledJob jobAvg){
+        jobAvg.getJob().setReducerClass(ReviewsReducerAvg2.class);
+        jobAvg.getJob().setOutputValueClass(DoubleWritable.class);
     }
 
     public static void jobBeerAndBreweries(ControlledJob jobBeerAndBreweries,Path beerPath,Path breweriesPath, Path beersAndBreweriesTmpPath){
@@ -94,7 +102,6 @@ public class Common {
         MultipleInputs.addInputPath(jobBeerAndBreweries.getJob(),breweriesPath, TextInputFormat.class, BreweriesMapper.class);
         SequenceFileOutputFormat.setOutputPath(jobBeerAndBreweries.getJob(), beersAndBreweriesTmpPath);
         jobBeerAndBreweries.getJob().setJarByClass(Job2.class);
-        jobBeerAndBreweries.getJob().setReducerClass(BeersAndBreweriesReducer.class);
         jobBeerAndBreweries.getJob().setMapOutputKeyClass(IntWritable.class);
         jobBeerAndBreweries.getJob().setMapOutputValueClass(BeerOrBrewery.class);
         jobBeerAndBreweries.getJob().setOutputKeyClass(IntWritable.class);
@@ -102,6 +109,12 @@ public class Common {
         jobBeerAndBreweries.getJob().setOutputFormatClass(SequenceFileOutputFormat.class);
     }
 
+    public static void setReducerJob2JoinBeerBrewery(ControlledJob jobBeerAndBreweries){
+        jobBeerAndBreweries.getJob().setReducerClass(BeersAndBreweriesReducer.class);
+    }
+    public static void setReducerJob1JoinBeerBrewery(ControlledJob jobBeerAndBreweries){
+        jobBeerAndBreweries.getJob().setReducerClass(BeersAndBreweriesReducer2.class);
+    }
     public static Path getBeerPath() {
         return beerPath;
     }

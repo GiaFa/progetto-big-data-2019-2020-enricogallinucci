@@ -1,9 +1,7 @@
 package hadoop.job2;
 
 import hadoop.BeerOrBrewery;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.DataInput;
 import java.io.DataOutput;

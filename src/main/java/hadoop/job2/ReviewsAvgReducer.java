@@ -6,7 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-public class ReviewsAvg extends Reducer<IntWritable, DoubleWritable,IntWritable,IntWritable> {
+public class ReviewsAvgReducer extends Reducer<IntWritable, DoubleWritable,IntWritable,IntWritable> {
 
     public void reduce(IntWritable key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
         double total = 0, count = 0;

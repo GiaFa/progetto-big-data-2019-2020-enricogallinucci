@@ -66,10 +66,12 @@ public class Job2  extends Configured implements Tool {
 
     private static void setJobAvg() throws IOException {
         Common.jobAvg(jobAvg,Common.getReviewsPath(),Common.getAvgTmpPath());
+        Common.setReducerJob2Avg(jobAvg);
     }
 
     private static void setJobBeerAndBreweries(){
         Common.jobBeerAndBreweries(jobBeerAndBreweries,Common.getBeerPath(),Common.getBreweriesPath(),Common.getBeersAndBreweriesTmpPath());
+        Common.setReducerJob2JoinBeerBrewery(jobBeerAndBreweries);
     }
 
     private static void setJobBreweriesClasses(){
