@@ -28,7 +28,7 @@ public class Job2  extends Configured implements Tool {
     private static ControlledJob jobBeerAndBreweries;
     private static ControlledJob jobBreweriesClasses;
     private static ControlledJob jobFinal;
-
+    private static final int nBirrerie = 20, nClass = 5, minAvgScore = 2, minRecensioni = 50;
    public static void main(String[] args) throws Exception {
        ToolRunner.run(new Job2(), args);
    }
@@ -38,12 +38,24 @@ public class Job2  extends Configured implements Tool {
         setControllerJobAndJobControl();
         Common.allPath();
         Common.verifyDirectory();
+        setGlobalVariable(args);
         setJobAvg();
         setJobBeerAndBreweries();
         setJobBreweriesClasses();
         setFinalJob();
         Common.runJobControl(jc);
         return 0;
+    }
+
+    private void setGlobalVariable(String[] args) {
+        if(args.length>2)
+            getConf().setInt("nBirrerie", Integer.parseInt(args[2]));
+        if(args.length>3)
+            getConf().setInt("minRecensioni", Integer.parseInt(args[3]));
+        if(args.length>4)
+            getConf().setInt("nClass", Integer.parseInt(args[4]));
+        if(args.length>5)
+            getConf().setInt("minAvgScore",Integer.parseInt(args[5]));
     }
 
     private static void setControllerJobAndJobControl() throws IOException {

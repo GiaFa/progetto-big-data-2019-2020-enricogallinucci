@@ -10,7 +10,7 @@ import java.io.IOException;
 public class BreweriesAndAvg implements Writable {
     private BeerOrBrewery beerOrBrewery = new BeerOrBrewery();
     private double avgBeer;
-    private boolean isBeer;
+    private boolean isAvg;
     public void setBeerOrBrewery(BeerOrBrewery beerOrBrewery) {
         this.beerOrBrewery = beerOrBrewery;
     }
@@ -23,22 +23,22 @@ public class BreweriesAndAvg implements Writable {
     public void write(DataOutput out) throws IOException {
         beerOrBrewery.write(out);
         out.writeDouble(avgBeer);
-        out.writeBoolean(isBeer);
+        out.writeBoolean(isAvg);
     }
 
     @Override
     public void readFields(DataInput in) throws IOException {
         this.beerOrBrewery = BeerOrBrewery.read(in);
         this.avgBeer = in.readDouble();
-        this.isBeer = in.readBoolean();
+        this.isAvg = in.readBoolean();
     }
 
     public void setAvgBeer(double avgBeer) {
         this.avgBeer = avgBeer;
-        this.isBeer=true;
+        this.isAvg=true;
     }
-    public boolean getIsBeer() {
-        return isBeer;
+    public boolean getIsAvg() {
+        return isAvg;
     }
     public double getAvgBeer() {
         return avgBeer;

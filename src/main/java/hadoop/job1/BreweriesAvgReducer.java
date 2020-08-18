@@ -8,26 +8,31 @@ import java.io.IOException;
 import java.util.*;
 
 public class BreweriesAvgReducer extends Reducer<IntWritable, BreweriesAndAvg, IntWritable, Text> {
-    private final Map<Integer,BreweriesAndAvg> breweriesAndAvgMap = new LinkedHashMap<>();
+    private final Map<Integer,BreweriesAndAvg> breweriesAndAvgMap = new HashMap<>();
+    private final static int INIT_VALUE = 0;
+    private static final int nBirrerie = 20;
     public void reduce(IntWritable keyBeer, Iterable<BreweriesAndAvg> values, Context context) {
         BreweriesAndAvg result = new BreweriesAndAvg();
+        int size = 0;
         for(BreweriesAndAvg value: values){
-            if(value.getIsBeer()){
+            size++;
+            if(value.getIsAvg()){
                 result.setAvgBeer(value.getAvgBeer());
-            }else {
+            }else{
                 result.setBeerOrBrewery(value.getBeerOrBrewery());
             }
         }
-        breweriesAndAvgMap.put(result.getBeerOrBrewery().getBrewery().getId(),result);
-
+        if(size>1){
+            breweriesAndAvgMap.put(result.getBeerOrBrewery().getBrewery().getId(),result);
+        }
     }
 
     public void cleanup(Context context) throws IOException, InterruptedException {
-        List<Map.Entry<Integer,BreweriesAndAvg>> result =sorted().subList(0,20); //first 20 element
+        List<Map.Entry<Integer,BreweriesAndAvg>> result =sorted().subList(INIT_VALUE,context.getConfiguration().getInt("nBirrerie",nBirrerie)); //first 20 element
         int count = 1;
         for(Map.Entry<Integer,BreweriesAndAvg> breweryBeer : result){
-            String finalResult = print(breweryBeer.getValue().getBeerOrBrewery().getBrewery().getName(),
-                                        count,breweryBeer.getValue().getAvgBeer());
+            String name = breweryBeer.getValue().getBeerOrBrewery().getBrewery().getName();
+            String finalResult = print(name,count,breweryBeer.getValue().getAvgBeer());
             context.write(new IntWritable(breweryBeer.getKey()),new Text(finalResult));
             count++;
         }
@@ -41,7 +46,7 @@ public class BreweriesAvgReducer extends Reducer<IntWritable, BreweriesAndAvg, I
                     @Override
                     public int compare(Map.Entry<Integer,BreweriesAndAvg> es1,
                                        Map.Entry<Integer,BreweriesAndAvg> es2) {
-                        return Double.compare(es2.getValue().getAvgBeer(),es1.getValue().getAvgBeer());
+                        return Double.compare(es2.getValue().getAvgBeer(), es1.getValue().getAvgBeer());
                     }
                 });
         return element;

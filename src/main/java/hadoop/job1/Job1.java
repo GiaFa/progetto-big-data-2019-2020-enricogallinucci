@@ -9,7 +9,6 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -25,7 +24,6 @@ public class Job1  extends Configured implements Tool {
     private static ControlledJob jobAvg;
     private static ControlledJob jobBeerAndBreweries;
     private static ControlledJob jobUnion;
-
     public static void main(String[] args)throws Exception {
         ToolRunner.run(new Job1(), args);
 
@@ -35,12 +33,23 @@ public class Job1  extends Configured implements Tool {
         setControllerJobAndJobControl();
         Common.allPath();
         Common.verifyDirectory();
+        setGlobalVariable(args);
         setJobAvg();
         setJobBeerAndBreweries();
         setJobUnion();
         Common.runJobControl(jc);
         return 0;
     }
+
+    private void setGlobalVariable(String[] args) {
+        if(args.length>2)
+             getConf().setInt("nBirrerie",Integer.parseInt(args[2]));
+        if(args.length>3)
+            getConf().setInt("beersForBrewery",Integer.parseInt(args[3]));
+        if(args.length>4)
+            getConf().setInt("minRecensioni",Integer.parseInt(args[4]));
+    }
+
     private static void setControllerJobAndJobControl() throws IOException {
         jobAvg = Common.controlledJob();
         jobBeerAndBreweries = Common.controlledJob();
@@ -65,6 +74,7 @@ public class Job1  extends Configured implements Tool {
         Common.setReducerJob1JoinBeerBrewery(jobBeerAndBreweries);
     }
     private static void setJobUnion(){
+
         jobUnion.getJob().setNumReduceTasks(1);
         MultipleInputs.addInputPath(jobUnion.getJob(),Common.getAvgTmpPath(), SequenceFileInputFormat.class, AvgMapper2.class);
         MultipleInputs.addInputPath(jobUnion.getJob(),Common.getBeersAndBreweriesTmpPath(), SequenceFileInputFormat.class, BreweriesAvgMapper.class);

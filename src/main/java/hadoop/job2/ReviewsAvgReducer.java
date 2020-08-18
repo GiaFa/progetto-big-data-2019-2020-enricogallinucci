@@ -7,14 +7,15 @@ import org.apache.hadoop.mapreduce.Reducer;
 import java.io.IOException;
 
 public class ReviewsAvgReducer extends Reducer<IntWritable, DoubleWritable,IntWritable,IntWritable> {
-
+    private static final int minRecensioni = 50;
     public void reduce(IntWritable key, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
         double total = 0, count = 0;
         for (DoubleWritable doubleWritable : values) {
             count++;
             total += doubleWritable.get();
         }
-        if(count > 50){
+        final int minRecensione = context.getConfiguration().getInt("minRecensioni",minRecensioni);
+        if(count > minRecensione){
             //fare qualcosa con medie? buh
             double avg = total / count;
             if(avg < Common.LOW_CLASS){
