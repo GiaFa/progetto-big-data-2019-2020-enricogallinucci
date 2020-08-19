@@ -1,12 +1,6 @@
 package hadoop.job1;
 
 import hadoop.commonjob.Common;
-import hadoop.job2.Job2;
-import hadoop.job2.Pair;
-import hadoop.job2.ResultMapper;
-import hadoop.job2.ResultReducer;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;

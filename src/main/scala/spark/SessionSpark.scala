@@ -4,7 +4,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 
 abstract class SessionSpark extends Serializable {
-  implicit val sparkSession: SparkSession = SparkSession.builder().config("spark.master","local").appName("Progetto BigData").getOrCreate()
+  implicit val sparkSession: SparkSession = SparkSession.builder().appName("Progetto BigData").getOrCreate()
 
   def readFile(): (RDD[String], RDD[String], RDD[String]) ={
     val beers = sparkSession.sparkContext.textFile("faspeeencina/datasets/input/project/file/beers.csv")
