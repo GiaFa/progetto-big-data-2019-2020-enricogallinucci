@@ -15,6 +15,8 @@ public class BreweriesClassesReducer extends Reducer<IntWritable, BreweriesAndCl
                 result.setBeerOrBrewery(value.getBeerOrBrewery());
             }
         }
-        context.write(new IntWritable(result.getBeerOrBrewery().getBrewery().getId()),result);
+        if(result.getBeerClass()!=0){
+            context.write(new IntWritable(result.getBeerOrBrewery().getBrewery().getId()),result);
+        }
     }
 }

@@ -1,12 +1,11 @@
 package spark.job2
 
-import org.apache.spark.HashPartitioner
 import org.apache.spark.broadcast.Broadcast
-import spark.{Beers, Breweries, Reviews, SessionSpark}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
 import spark.commonmethod.Common
+import spark.{Beers, Breweries, Reviews, SessionSpark}
 
 object TopBeers extends SessionSpark{
   def toPrint(values:(Int,(String,Int,Int,Int))): String = {
@@ -24,7 +23,7 @@ object TopBeers extends SessionSpark{
     val reviewsAverageClass = createClassAvg(reviewsRDDAveraged,RANGE_SCORE_B)
     val beersAndBreweriesJoin = filterBreweries(beersRDD,breweriesRDD)
     val rddFinal =  countBeerPerBreweries(beersAndBreweriesJoin,reviewsAverageClass,RANGE_SCORE_B)
-    searchNameBreweries(rddFinal,breweriesRDD)./*.zipWithIndex().filter(_._2 < nBirrerie).map(x => x._1).*/map(toPrint).saveAsTextFile("faspeeencina/datasets/output/project/spark/")
+    searchNameBreweries(rddFinal,breweriesRDD).zipWithIndex().filter(_._2 < nBirrerie).map(x => x._1).map(toPrint).saveAsTextFile("faspeeencina/datasets/output/project/spark/")
   }
 
   def removeFirstRow(rdd: RDD[String]): RDD[String] = {

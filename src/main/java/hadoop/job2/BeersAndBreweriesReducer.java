@@ -6,8 +6,8 @@ import hadoop.Brewery;
 import hadoop.commonjob.CommonMethodReducer;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BeersAndBreweriesReducer extends Reducer<IntWritable, BeerOrBrewery,IntWritable,BeerOrBrewery> {

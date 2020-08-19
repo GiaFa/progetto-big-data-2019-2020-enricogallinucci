@@ -37,12 +37,12 @@ public class Common {
     private static FileSystem fs;
     private static final Object monitor = new Object();
     public static void allPath() throws IOException {
-//        beerPath = new Path("faspeeencina/datasets/input/project/file/beers.csv");
-//        breweriesPath = new Path("faspeeencina/datasets/input/project/file/breweries.csv");
-//        reviewsPath = new Path("faspeeencina/datasets/input/project/file/reviews.csv");
-        beerPath = new Path("giovannim/dataset/input/datasetprogetto/beers.csv");
-        breweriesPath = new Path("giovannim/dataset/input/datasetprogetto/breweries.csv");
-        reviewsPath = new Path("giovannim/dataset/input/datasetprogetto/reviews.csv");
+       beerPath = new Path("faspeeencina/datasets/input/project/file/beers.csv");
+       breweriesPath = new Path("faspeeencina/datasets/input/project/file/breweries.csv");
+       reviewsPath = new Path("faspeeencina/datasets/input/project/file/reviews.csv");
+       //beerPath = new Path("giovannim/dataset/input/datasetprogetto/beers.csv");
+       //breweriesPath = new Path("giovannim/dataset/input/datasetprogetto/breweries.csv");
+       //reviewsPath = new Path("giovannim/dataset/input/datasetprogetto/reviews.csv");
         avgTmpPath = new Path("faspeeencina/datasets/output/datasetprogetto/hadoop/AvgTmp");
         beersAndBreweriesTmpPath = new Path("faspeeencina/datasets/output/datasetprogetto/hadoop/BeersAndBreweries");
         breweriesClassesPath = new Path("faspeeencina/datasets/output/datasetprogetto/hadoop/BreweriesClasses");

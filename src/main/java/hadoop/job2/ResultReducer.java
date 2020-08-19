@@ -1,10 +1,6 @@
 package hadoop.job2;
 
-import hadoop.Beer;
-import hadoop.BeerOrBrewery;
-import hadoop.Brewery;
 import hadoop.commonjob.Common;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -14,7 +10,7 @@ import java.util.*;
 public class ResultReducer extends Reducer<Pair, Text,Text,Text> {
     private static final int nBirrerie = 20;
     public static Map<String,ResultToPrint> map = new HashMap<>();
-    public void reduce(Pair key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+    public void reduce(Pair key, Iterable<Text> values, Context context) {
         int count = 0;
         String k = "";
         for(Text t: values){
@@ -36,7 +32,7 @@ public class ResultReducer extends Reducer<Pair, Text,Text,Text> {
     }
 
     public void cleanup(Context context) throws IOException, InterruptedException {
-        List<Map.Entry<String,ResultToPrint>> result =sorted();//.subList(0,context.getConfiguration().getInt("nBirrerie",nBirrerie)); //first 20 element
+        List<Map.Entry<String,ResultToPrint>> result =sorted().subList(0,context.getConfiguration().getInt("nBirrerie",nBirrerie)); //first 20 element
         for(Map.Entry<String,ResultToPrint> brew: result){
             context.write(new Text(brew.getKey()), new Text(brew.getValue().toString()));
         }
