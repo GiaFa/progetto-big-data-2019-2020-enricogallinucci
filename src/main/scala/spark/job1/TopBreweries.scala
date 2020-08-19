@@ -1,6 +1,7 @@
 package spark.job1
 
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
 import spark.commonmethod.Common
 import spark.{Beers, Breweries, Reviews, SessionSpark}
 
@@ -12,9 +13,9 @@ import spark.{Beers, Breweries, Reviews, SessionSpark}
  */
 object TopBreweries extends SessionSpark {
 
-  def executeJob(nBirrerie: Int = 20,beersForBrewery: Int = 5, minRecensioni: Int = 50): Unit = {
+  def executeJob(sparkSession: SparkSession, nBirrerie: Int = 20,beersForBrewery: Int = 5, minRecensioni: Int = 50): Unit = {
 
-    val (beers,reviews,breweries) = readFile()
+    val (beers,reviews,breweries) = readFile(sparkSession)
     val beersRDD = removeFirstRow(beers).map(Beers.extract).keyBy(_.brewery_id)
     val breweriesRDD = removeFirstRow(breweries).map(Breweries.extract).keyBy(_.id)
     val reviewsRDD = removeFirstRow(reviews).map(Reviews.extract).keyBy(_.beer_id)
