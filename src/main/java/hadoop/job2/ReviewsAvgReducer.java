@@ -15,7 +15,7 @@ public class ReviewsAvgReducer extends Reducer<IntWritable, DoubleWritable,IntWr
             total += doubleWritable.get();
         }
         final int minRecensione = context.getConfiguration().getInt("minRecensioni",minRecensioni);
-        if(count > minRecensione){
+        if(count >= minRecensione){
             //fare qualcosa con medie? buh
             double avg = total / count;
             if(avg < Common.LOW_CLASS){

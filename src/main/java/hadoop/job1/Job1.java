@@ -1,6 +1,12 @@
 package hadoop.job1;
 
 import hadoop.commonjob.Common;
+import hadoop.job2.Job2;
+import hadoop.job2.Pair;
+import hadoop.job2.ResultMapper;
+import hadoop.job2.ResultReducer;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -9,6 +15,7 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -19,11 +26,11 @@ import java.io.IOException;
  * (puo cambiare la quantita), vedremo la media di ricensioni per ogni birra).
  */
 public class Job1  extends Configured implements Tool {
-
     private static final JobControl jc=Common.jobControl("Job1");
     private static ControlledJob jobAvg;
     private static ControlledJob jobBeerAndBreweries;
     private static ControlledJob jobUnion;
+    private static ControlledJob jobFinal;
     public static void main(String[] args)throws Exception {
         ToolRunner.run(new Job1(), args);
 
@@ -37,16 +44,17 @@ public class Job1  extends Configured implements Tool {
         setJobAvg();
         setJobBeerAndBreweries();
         setJobUnion();
+        setFinalJob();
         Common.runJobControl(jc);
         return 0;
     }
 
     private void setGlobalVariable(String[] args) {
+        if(args.length>1)
+            jobFinal.getJob().getConfiguration().setInt("nBirrerie",Integer.parseInt(args[2]));
         if(args.length>2)
-             jobUnion.getJob().getConfiguration().setInt("nBirrerie",Integer.parseInt(args[2]));
-        if(args.length>3)
             jobBeerAndBreweries.getJob().getConfiguration().setInt("beersForBrewery",Integer.parseInt(args[3]));
-        if(args.length>4)
+        if(args.length>3)
             jobAvg.getJob().getConfiguration().setInt("minRecensioni",Integer.parseInt(args[4]));
     }
 
@@ -54,8 +62,10 @@ public class Job1  extends Configured implements Tool {
         jobAvg = Common.controlledJob();
         jobBeerAndBreweries = Common.controlledJob();
         jobUnion = Common.controlledJob();
+        jobFinal = Common.controlledJob();
         jobUnion.addDependingJob(jobAvg);
         jobUnion.addDependingJob(jobBeerAndBreweries);
+        jobFinal.addDependingJob(jobUnion);
         setJobControl();
     }
 
@@ -63,6 +73,7 @@ public class Job1  extends Configured implements Tool {
         jc.addJob(jobAvg);
         jc.addJob(jobBeerAndBreweries);
         jc.addJob(jobUnion);
+        jc.addJob(jobFinal);
     }
 
     private static void setJobAvg() throws IOException {
@@ -74,8 +85,6 @@ public class Job1  extends Configured implements Tool {
         Common.setReducerJob1JoinBeerBrewery(jobBeerAndBreweries);
     }
     private static void setJobUnion(){
-
-        jobUnion.getJob().setNumReduceTasks(1);
         MultipleInputs.addInputPath(jobUnion.getJob(),Common.getAvgTmpPath(), SequenceFileInputFormat.class, AvgMapper2.class);
         MultipleInputs.addInputPath(jobUnion.getJob(),Common.getBeersAndBreweriesTmpPath(), SequenceFileInputFormat.class, BreweriesAvgMapper.class);
         FileOutputFormat.setOutputPath(jobUnion.getJob(),Common.getBreweriesClassesPath());
@@ -84,7 +93,24 @@ public class Job1  extends Configured implements Tool {
         jobUnion.getJob().setMapOutputKeyClass(IntWritable.class);
         jobUnion.getJob().setMapOutputValueClass(BreweriesAndAvg.class);
         jobUnion.getJob().setOutputKeyClass(IntWritable.class);
-        jobUnion.getJob().setOutputValueClass(Text.class);
+        jobUnion.getJob().setOutputValueClass(BreweriesAndAvg.class);
+        jobUnion.getJob().setOutputFormatClass(SequenceFileOutputFormat.class);
+
+
+
+    }
+    private static void setFinalJob() throws IOException {
+        jobFinal.getJob().setNumReduceTasks(1);
+        SequenceFileInputFormat.addInputPath(jobFinal.getJob(),Common.getBreweriesClassesPath());
+        jobFinal.getJob().setInputFormatClass(SequenceFileInputFormat.class);
+        FileOutputFormat.setOutputPath(jobFinal.getJob(),Common.getResultPath());
+        jobFinal.getJob().setJarByClass(Job1.class);
+        jobFinal.getJob().setMapperClass(FinalJobMapper.class);
+        jobFinal.getJob().setReducerClass(FinalJobReducer.class);
+        jobFinal.getJob().setMapOutputKeyClass(IntWritable.class);
+        jobFinal.getJob().setMapOutputValueClass(BreweriesAndAvg.class);
+        jobFinal.getJob().setOutputKeyClass(IntWritable.class);
+        jobFinal.getJob().setOutputValueClass(Text.class);
     }
 
 }
