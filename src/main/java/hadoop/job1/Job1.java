@@ -43,11 +43,11 @@ public class Job1  extends Configured implements Tool {
 
     private void setGlobalVariable(String[] args) {
         if(args.length>2)
-             getConf().setInt("nBirrerie",Integer.parseInt(args[2]));
+             jobUnion.getJob().getConfiguration().setInt("nBirrerie",Integer.parseInt(args[2]));
         if(args.length>3)
-            getConf().setInt("beersForBrewery",Integer.parseInt(args[3]));
+            jobBeerAndBreweries.getJob().getConfiguration().setInt("beersForBrewery",Integer.parseInt(args[3]));
         if(args.length>4)
-            getConf().setInt("minRecensioni",Integer.parseInt(args[4]));
+            jobAvg.getJob().getConfiguration().setInt("minRecensioni",Integer.parseInt(args[4]));
     }
 
     private static void setControllerJobAndJobControl() throws IOException {
