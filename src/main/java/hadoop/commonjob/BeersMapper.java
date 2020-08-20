@@ -23,7 +23,6 @@ public class BeersMapper extends Mapper<Object, Text, IntWritable, BeerOrBrewery
     public void map(Object key, Text value, Context context)
         throws IOException, InterruptedException {
         if (!first) {
-
             List<String> columns = Arrays.asList(value.toString().split(","));
             int id = getInt(columns.get(0));
             int i = 2;

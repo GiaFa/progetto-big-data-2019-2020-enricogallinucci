@@ -1,5 +1,6 @@
 package spark.job1
 
+import org.apache.hadoop.fs.Path
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SparkSession
 import spark.commonmethod.Common
@@ -13,7 +14,15 @@ import spark.{Beers, Breweries, Reviews, SessionSpark}
  */
 object TopBreweries extends SessionSpark {
 
-  def executeJob(sparkSession: SparkSession, nBirrerie: Int = 20,beersForBrewery: Int = 5, minRecensioni: Int = 50): Unit = {
+  private val RESULT_PATH = "giovannim/dataset/output/datasetprogetto/spark/job1"
+
+  def toPrint(values:((Int,(String,Double)),Long)): String = {
+    values._1._1.toString.concat(" La Birreria : ".concat(values._1._2._1).concat(" è la Top : ").concat((values._2+1).toString)
+      .concat(" Con un score di : ").concat(values._1._2._2.toString))
+  }
+
+  def executeJob(sparkSession: SparkSession, nBirrerie: Int, beersForBrewery:Int, minRecensioni: Int): Unit = {
+    Common.verifyDirectory(sparkSession,new Path(RESULT_PATH))
 
     val (beers,reviews,breweries) = readFile(sparkSession)
     val beersRDD = removeFirstRow(beers).map(Beers.extract).keyBy(_.brewery_id)
@@ -22,7 +31,7 @@ object TopBreweries extends SessionSpark {
     val beersAndBreweriesJoin = filterBreweries(beersRDD,breweriesRDD,beersForBrewery)
     val reviewsRDDAveraged = Common.filterAndAvgReviews(reviewsRDD,minRecensioni)
 
-    topNBreweries(beersAndBreweriesJoin,reviewsRDDAveraged).zipWithIndex().filter(_._2 < nBirrerie).saveAsTextFile("giovannim/dataset/output/datasetprogetto/spark/")
+    topNBreweries(beersAndBreweriesJoin,reviewsRDDAveraged).zipWithIndex().filter(_._2 < nBirrerie).map(toPrint).saveAsTextFile(RESULT_PATH)
 
   }
 

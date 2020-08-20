@@ -13,8 +13,7 @@ public class CommonMethodReducer {
     public void myReduce(Iterable<BeerOrBrewery> values) {
         beers = new ArrayList<>();
         brewery = new Brewery();
-        for (
-                BeerOrBrewery beerOrBrewery : values) {
+        for (BeerOrBrewery beerOrBrewery : values) {
             if (!beerOrBrewery.isBeer()) {
                 brewery = beerOrBrewery.getBrewery();
             } else {

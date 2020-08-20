@@ -14,12 +14,15 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 
 /**
- * Prima classificare le birre in base alla media voto (ad es: voti alti/medi/bassi, oppure ottima/buona/discreta/ecc.,
- * a seconda dei dati), quindi calcolare per ogni birreria la quantità di birre in ogni classe; eventualmente le si può
- * anche ordinare sulla base di uno score (ipotizzando di associare ad ogni classe un punteggio).
+ * Inizialmente classifichiamo le birre in base alla media dei voti, poi le dividiamo in classi
+ * di voto: media &lt;= 2 bassa qualita; 2&lt; media &lt;= 4 media qualita; media &gt; 4 alta qualità.
+ * Per ogni birreria viene calcolata la quantità di birre in ogni classe; alla fine, le birrerie
+ * vengono ordinate in base ad uno score, dove la percentuale di birre per ogni classe viene moltiplicata
+ * per un punteggio di classe predefinito.
  */
 public class Job2  extends Configured implements Tool {
 
@@ -47,10 +50,12 @@ public class Job2  extends Configured implements Tool {
     }
 
     private void setGlobalVariable(String[] args) {
-        if(args.length>2)
-            jobFinal.getJob().getConfiguration().setInt("nBirrerie", Integer.parseInt(args[2]));
-        if(args.length>3)
-            jobAvg.getJob().getConfiguration().setInt("minRecensioni", Integer.parseInt(args[3]));
+        if(args.length>0 && Pattern.matches("([0-9]*)",args[0])){
+            jobFinal.getJob().getConfiguration().setInt("nBirrerie", Integer.parseInt(args[0]));
+        }
+        if(args.length>1 && Pattern.matches("([0-9]*)",args[1])){
+            jobAvg.getJob().getConfiguration().setInt("minRecensioni", Integer.parseInt(args[1]));
+        }
     }
 
     private static void setControllerJobAndJobControl() throws IOException {
@@ -101,7 +106,7 @@ public class Job2  extends Configured implements Tool {
         jobFinal.getJob().setNumReduceTasks(1);
         SequenceFileInputFormat.addInputPath(jobFinal.getJob(),Common.getBreweriesClassesPath());
         jobFinal.getJob().setInputFormatClass(SequenceFileInputFormat.class);
-        FileOutputFormat.setOutputPath(jobFinal.getJob(),Common.getResultPath());
+        FileOutputFormat.setOutputPath(jobFinal.getJob(),Common.getResultPathJob2());
         jobFinal.getJob().setJarByClass(Job2.class);
         jobFinal.getJob().setMapperClass(ResultMapper.class);
         jobFinal.getJob().setReducerClass(ResultReducer.class);

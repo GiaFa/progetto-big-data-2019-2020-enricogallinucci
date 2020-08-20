@@ -22,11 +22,10 @@ public class FinalJobReducer extends Reducer<IntWritable, BreweriesAndAvg, IntWr
             total += result.getAvgBeer();
         }
         resultAvgMap.put(keyBrewery.get(),total/count);
-
     }
 
     public void cleanup(Context context) throws IOException, InterruptedException {
-        List<Map.Entry<Integer,Double>> result =sorted().subList(INIT_VALUE,context.getConfiguration().getInt("nBirrerie",nBirrerie)); //first 20 element
+        List<Map.Entry<Integer,Double>> result =sorted().subList(INIT_VALUE,context.getConfiguration().getInt("nBirrerie",nBirrerie));
         int count = 1;
         for(Map.Entry<Integer,Double> breweryBeer : result){
             String name =breweriesAndAvgMap.get(breweryBeer.getKey());
@@ -53,7 +52,7 @@ public class FinalJobReducer extends Reducer<IntWritable, BreweriesAndAvg, IntWr
 
     private String print(String nameBirreria, int top, double score) {
         return " La Birreria : ".concat(nameBirreria)
-                .concat(" e la Top : ").concat(Integer.toString(top)).concat(" Con un score di : ")
+                .concat(" e' la Top : ").concat(Integer.toString(top)).concat(" Con un score di : ")
                 .concat(Double.toString(score));
     }
 

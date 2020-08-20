@@ -14,10 +14,11 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
+
 /**
- * Top 20 birrerie con almeno 5 birre diverse
- * con le medie di voti piu alta.(50 recensioni minima per ogni birra
- * (puo cambiare la quantita), vedremo la media di ricensioni per ogni birra).
+ * Top N birrerie(N passabile come parametro, default 20) con almeno N birre diverse(N secondo parametro, default 5)
+ * con le medie di voti piu alta.(N recensioni minime per ogni birra, terzo parametro, 50 default).
  */
 public class Job1  extends Configured implements Tool {
     private static final JobControl jc=Common.jobControl("Job1");
@@ -27,7 +28,6 @@ public class Job1  extends Configured implements Tool {
     private static ControlledJob jobFinal;
     public static void main(String[] args)throws Exception {
         ToolRunner.run(new Job1(), args);
-
     }
     @Override
     public int run(String[] args) throws Exception {
@@ -44,12 +44,15 @@ public class Job1  extends Configured implements Tool {
     }
 
     private void setGlobalVariable(String[] args) {
-        if(args.length>1)
-            jobFinal.getJob().getConfiguration().setInt("nBirrerie",Integer.parseInt(args[2]));
-        if(args.length>2)
-            jobBeerAndBreweries.getJob().getConfiguration().setInt("beersForBrewery",Integer.parseInt(args[3]));
-        if(args.length>3)
-            jobAvg.getJob().getConfiguration().setInt("minRecensioni",Integer.parseInt(args[4]));
+        if(args.length>0 && Pattern.matches("([0-9]*)",args[0])){
+            jobFinal.getJob().getConfiguration().setInt("nBirrerie",Integer.parseInt(args[0]));
+        }
+        if(args.length>1 && Pattern.matches("([0-9]*)",args[1])){
+            jobBeerAndBreweries.getJob().getConfiguration().setInt("beersForBrewery",Integer.parseInt(args[1]));
+        }
+        if(args.length>2 && Pattern.matches("([0-9]*)",args[2])){
+            jobAvg.getJob().getConfiguration().setInt("minRecensioni",Integer.parseInt(args[2]));
+        }
     }
 
     private static void setControllerJobAndJobControl() throws IOException {
@@ -97,7 +100,7 @@ public class Job1  extends Configured implements Tool {
         jobFinal.getJob().setNumReduceTasks(1);
         SequenceFileInputFormat.addInputPath(jobFinal.getJob(),Common.getBreweriesClassesPath());
         jobFinal.getJob().setInputFormatClass(SequenceFileInputFormat.class);
-        FileOutputFormat.setOutputPath(jobFinal.getJob(),Common.getResultPath());
+        FileOutputFormat.setOutputPath(jobFinal.getJob(),Common.getResultPathJob1());
         jobFinal.getJob().setJarByClass(Job1.class);
         jobFinal.getJob().setMapperClass(FinalJobMapper.class);
         jobFinal.getJob().setReducerClass(FinalJobReducer.class);

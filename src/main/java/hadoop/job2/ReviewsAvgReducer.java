@@ -18,9 +18,9 @@ public class ReviewsAvgReducer extends Reducer<IntWritable, DoubleWritable,IntWr
         if(count >= minRecensione){
             //fare qualcosa con medie? buh
             double avg = total / count;
-            if(avg < Common.LOW_CLASS){
+            if(avg <= Common.LOW_CLASS){
                 context.write(key, new IntWritable(Common.LOW_CLASS));
-            } else if(avg < Common.MEDIUM_CLASS){
+            } else if(avg <= Common.MEDIUM_CLASS){
                 context.write(key, new IntWritable(Common.MEDIUM_CLASS));
             } else {
                 context.write(key, new IntWritable(Common.HIGH_CLASS));

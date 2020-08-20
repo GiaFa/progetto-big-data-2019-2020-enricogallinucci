@@ -33,20 +33,22 @@ public class Common {
     private static Path avgTmpPath;
     private static Path beersAndBreweriesTmpPath;
     private static Path breweriesClassesPath;
-    private static Path resultPath;
+    private static Path resultJob1;
+    private static Path resultJob2;
     private static FileSystem fs;
     private static final Object monitor = new Object();
     public static void allPath() throws IOException {
-       beerPath = new Path("faspeeencina/datasets/input/project/file/beers.csv");
-       breweriesPath = new Path("faspeeencina/datasets/input/project/file/breweries.csv");
-       reviewsPath = new Path("faspeeencina/datasets/input/project/file/reviews.csv");
-       //beerPath = new Path("giovannim/dataset/input/datasetprogetto/beers.csv");
-       //breweriesPath = new Path("giovannim/dataset/input/datasetprogetto/breweries.csv");
-       //reviewsPath = new Path("giovannim/dataset/input/datasetprogetto/reviews.csv");
-        avgTmpPath = new Path("faspeeencina/datasets/output/datasetprogetto/hadoop/AvgTmp");
-        beersAndBreweriesTmpPath = new Path("faspeeencina/datasets/output/datasetprogetto/hadoop/BeersAndBreweries");
-        breweriesClassesPath = new Path("faspeeencina/datasets/output/datasetprogetto/hadoop/BreweriesClasses");
-        resultPath = new Path("faspeeencina/datasets/output/datasetprogetto/hadoop/job2");
+//       beerPath = new Path("faspeeencina/datasets/input/project/file/beers.csv");
+//       breweriesPath = new Path("faspeeencina/datasets/input/project/file/breweries.csv");
+//       reviewsPath = new Path("faspeeencina/datasets/input/project/file/reviews.csv");
+        beerPath = new Path("giovannim/dataset/input/datasetprogetto/beers.csv");
+        breweriesPath = new Path("giovannim/dataset/input/datasetprogetto/breweries.csv");
+        reviewsPath = new Path("giovannim/dataset/input/datasetprogetto/reviews.csv");
+        avgTmpPath = new Path("giovannim/datasets/output/datasetprogetto/hadoop/AvgTmp");
+        beersAndBreweriesTmpPath = new Path("giovannim/datasets/output/datasetprogetto/hadoop/BeersAndBreweries");
+        breweriesClassesPath = new Path("giovannim/datasets/output/datasetprogetto/hadoop/BreweriesClasses");
+        resultJob1 = new Path("giovannim/datasets/output/datasetprogetto/hadoop/job1");
+        resultJob2 = new Path("giovannim/datasets/output/datasetprogetto/hadoop/job2");
         fs =  FileSystem.get(getConf());
     }
 
@@ -63,9 +65,12 @@ public class Common {
             fs.delete(getBreweriesClassesPath(), true);
         }
 
+        if(fs.exists(getResultPathJob1())) {
+            fs.delete(getResultPathJob1(), true);
+        }
 
-        if(fs.exists(getResultPath())) {
-            fs.delete(getResultPath(), true);
+        if(fs.exists(getResultPathJob2())) {
+            fs.delete(getResultPathJob2(), true);
         }
     }
 
@@ -142,8 +147,12 @@ public class Common {
         return breweriesClassesPath;
     }
 
-    public static Path getResultPath() {
-        return resultPath;
+    public static Path getResultPathJob1() {
+        return resultJob1;
+    }
+
+    public static Path getResultPathJob2() {
+        return resultJob2;
     }
 
 
