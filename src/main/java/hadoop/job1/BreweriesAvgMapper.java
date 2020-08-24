@@ -1,6 +1,6 @@
 package hadoop.job1;
 
-import hadoop.BeerOrBrewery;
+import hadoop.commonjob.BeerOrBrewery;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Mapper;
 

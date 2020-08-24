@@ -1,4 +1,4 @@
-package hadoop;
+package hadoop.commonjob;
 
 import org.apache.hadoop.io.Writable;
 

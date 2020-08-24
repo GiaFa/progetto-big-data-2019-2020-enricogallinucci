@@ -1,8 +1,8 @@
 package hadoop.job2;
 
-import hadoop.Beer;
-import hadoop.BeerOrBrewery;
-import hadoop.Brewery;
+import hadoop.commonjob.Beer;
+import hadoop.commonjob.BeerOrBrewery;
+import hadoop.commonjob.Brewery;
 import hadoop.commonjob.CommonMethodReducer;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;

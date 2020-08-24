@@ -1,6 +1,6 @@
 package hadoop.job2;
 
-import hadoop.BeerOrBrewery;
+import hadoop.commonjob.BeerOrBrewery;
 import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;

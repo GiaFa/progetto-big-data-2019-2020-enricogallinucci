@@ -1,9 +1,5 @@
 package hadoop.commonjob;
 
-import hadoop.Beer;
-import hadoop.BeerOrBrewery;
-import hadoop.Brewery;
-
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,6 +1,5 @@
 package hadoop.commonjob;
 
-import hadoop.BeerOrBrewery;
 import hadoop.job1.BeersAndBreweriesReducer2;
 import hadoop.job1.ReviewsReducerAvg2;
 import hadoop.job2.BeersAndBreweriesReducer;
@@ -38,17 +37,14 @@ public class Common {
     private static FileSystem fs;
     private static final Object monitor = new Object();
     public static void allPath() throws IOException {
-//       beerPath = new Path("faspeeencina/datasets/input/project/file/beers.csv");
-//       breweriesPath = new Path("faspeeencina/datasets/input/project/file/breweries.csv");
-//       reviewsPath = new Path("faspeeencina/datasets/input/project/file/reviews.csv");
         beerPath = new Path("giovannim/dataset/input/datasetprogetto/beers.csv");
         breweriesPath = new Path("giovannim/dataset/input/datasetprogetto/breweries.csv");
         reviewsPath = new Path("giovannim/dataset/input/datasetprogetto/reviews.csv");
-        avgTmpPath = new Path("giovannim/datasets/output/datasetprogetto/hadoop/AvgTmp");
-        beersAndBreweriesTmpPath = new Path("giovannim/datasets/output/datasetprogetto/hadoop/BeersAndBreweries");
-        breweriesClassesPath = new Path("giovannim/datasets/output/datasetprogetto/hadoop/BreweriesClasses");
-        resultJob1 = new Path("giovannim/datasets/output/datasetprogetto/hadoop/job1");
-        resultJob2 = new Path("giovannim/datasets/output/datasetprogetto/hadoop/job2");
+        avgTmpPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/AvgTmp");
+        beersAndBreweriesTmpPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/BeersAndBreweries");
+        breweriesClassesPath = new Path("giovannim/dataset/output/datasetprogetto/hadoop/BreweriesClasses");
+        resultJob1 = new Path("giovannim/dataset/output/datasetprogetto/hadoop/job1");
+        resultJob2 = new Path("giovannim/dataset/output/datasetprogetto/hadoop/job2");
         fs =  FileSystem.get(getConf());
     }
 
