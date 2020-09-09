@@ -31,7 +31,7 @@ per essere considerate nella media dei voti.
 
 Per vedere il risultato è possibile eseguire il comando: 
 ```bash
-hdfs dfs -cat giovannim/datasets/output/datasetprogetto/hadoop/job1/*
+hdfs dfs -cat giovannim/dataset/output/datasetprogetto/hadoop/job1/*
 ```
 * Job2 Hadoop:
 ```bash
